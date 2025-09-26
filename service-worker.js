@@ -1,11 +1,11 @@
-const CACHE_NAME = "school-schedule-v1";
+const CACHE_NAME = "school-schedule-v2";
 const urlsToCache = [
   "/",
   "/index.html",
-  "/file/IOS 15 R SemiBold.ttf"
+  "/file/IOS 15 R SemiBold.ttf",
+  "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
 ];
 
-// تثبيت Service Worker وتخزين الملفات في الكاش
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -14,16 +14,19 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// جلب الملفات من الكاش إذا لم يكن هناك اتصال
 self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+      return response || fetch(event.request).then((fetchedResponse) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, fetchedResponse.clone());
+          return fetchedResponse;
+        });
+      });
     })
   );
 });
 
-// تحديث الكاش إذا غيرت الإصدار
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
