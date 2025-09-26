@@ -1,4 +1,4 @@
-const CACHE_NAME = "school-schedule-v2";
+const CACHE_NAME = "school-app-v4";
 const urlsToCache = [
   "/",
   "/index.html",
@@ -16,12 +16,17 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).then((fetchedResponse) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, fetchedResponse.clone());
-          return fetchedResponse;
-        });
+    caches.match(event.request).then((cachedResponse) => {
+      // لو لقى الملف في الكاش، يرجعو
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      // لو ما لقاوش، يجرب يجيب من الشبكة
+      return fetch(event.request).catch(() => {
+        // لو ما كاش نت والطلب صفحة HTML، يرجع index.html
+        if (event.request.headers.get("accept").includes("text/html")) {
+          return caches.match("/index.html");
+        }
       });
     })
   );
