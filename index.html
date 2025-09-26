@@ -495,8 +495,18 @@
             });
         });
     });
+    // تسجيل الـ Service Worker
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(() => console.log("✅ Service Worker تم تسجيله"))
+      .catch(err => console.log("❌ فشل التسجيل:", err));
+  });
+}
+
 </script>
 
 </body>
 </html>
+
 
