@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامج المدرسة الأسبوعي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'IOS 15 R SemiBold';
+            src: url('file/IOS 15 R SemiBold.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        :root {
+            --bg-color: linear-gradient(135deg, #1f2833, #2a3447);
+            --text-color: #ffffff;
+            --container-bg: linear-gradient(135deg, #2a3447, #333d52);
+            --card-bg: linear-gradient(135deg, #3a475d, #4b5a7a);
+            --card-border: #5a6e8f;
+            --header-bg: linear-gradient(to right, #4a90e2, #6ad2ff);
+            --header-text: #ffffff;
+            --item-bg: #444d67;
+            --item-border: #5a6e8f;
+            --item-hover-bg: #55607a;
+            --item-hover-border: #7287a9;
+            --completed-bg: #3c6e71;
+            --completed-border: #56a5a9;
+            --completed-text: #e0e0e0;
+            --secondary-text-color: #bbbbbb;
+            --link-bg: #4a90e2;
+            --link-hover-bg: #3a7bd5;
+            --nav-bg: #222222;
+            --nav-shadow-color: rgba(0, 0, 0, 0.4);
+            --nav-item-color: #aaaaaa;
+            --nav-item-active-color: #4a90e2;
+            --shadow-light: rgba(0, 0, 0, 0.3);
+            --shadow-dark: rgba(0, 0, 0, 0.5);
+            --divider-color: #666666;
+        }
+
+        body {
+            font-family: 'IOS 15 R SemiBold', 'Inter', sans-serif;
+            background: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .schedule-container {
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow-dark);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 {
+            color: #ffffff; /* Explicitly set to white for contrast */
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .day-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 6px 15px var(--shadow-light);
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid var(--card-border);
+            box-sizing: border-box;
+            transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: var(--header-bg);
+            color: var(--header-text);
+            font-weight: 700;
+            font-size: 1.5em;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 0;
+            text-align: center;
+            box-shadow: 0 2px 5px var(--shadow-light);
+            transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .day-header:active {
+            transform: scale(0.98);
+        }
+
+        .day-card.expanded .day-header {
+            margin-bottom: 20px;
+        }
+
+        .periods-list {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            padding: 0;
+            list-style: none;
+            opacity: 0;
+            max-height: 0;
+            transition: opacity 0.4s ease-out, max-height 0.4s ease-out;
+            overflow: hidden;
+        }
+
+        .day-card.expanded .periods-list {
+            display: flex;
+            opacity: 1;
+            max-height: 1500px;
+            transition: opacity 0.4s ease-in, max-height 0.4s ease-in;
+        }
+
+        .period-item {
+            background-color: var(--item-bg);
+            border-radius: 15px;
+            border: 1px solid var(--item-border);
+            padding: 9px 6px;
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .period-item:hover {
+            background-color: var(--item-hover-bg);
+            border-color: var(--item-hover-border);
+            box-shadow: 0 2px 8px var(--shadow-dark);
+            transform: translateY(-2px);
+        }
+
+        .period-item:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 4px var(--shadow-dark);
+        }
+
+        .subject-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--text-color);
+            flex-grow: 1;
+            text-align: right;
+            padding-right: 15px;
+        }
+
+        .period-time {
+            color: var(--secondary-text-color);
+            font-size: 1em;
+            padding: 0 0 0 15px;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .period-item.completed {
+            background-color: var(--completed-bg);
+            border-color: var(--completed-border);
+            text-decoration: line-through;
+            color: var(--completed-text);
+            transform: scale(0.98);
+            opacity: 0.8;
+        }
+
+        .period-item.completed .period-time {
+            color: var(--completed-text);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            animation: ripple-effect 0.6s linear;
+            transform: scale(0);
+            pointer-events: none;
+        }
+
+        @keyframes ripple-effect {
+            to {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        .session-divider {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px dashed var(--divider-color);
+            color: var(--divider-color);
+            overflow: visible;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .session-divider::before {
+            background: var(--container-bg);
+            padding: 0 10px;
+            position: relative;
+            top: -0.7em;
+            color: var(--secondary-text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            background-size: 200% auto;
+            animation: gradient-shift 3s linear infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .session-divider.morning::before {
+            content: "الفترة الصباحية";
+            background: linear-gradient(to right, #FFA500, #FFD700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.1em;
+        }
+
+        .session-divider.afternoon::before {
+            content: "الفترة المسائية";
+            background: linear-gradient(to right, #ADD8E6, #FFFFFF);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 600px) {
+            .schedule-container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
+            .day-card {
+                padding: 15px;
+            }
+
+            .day-header {
+                font-size: 1.3em;
+                padding: 12px 15px;
+            }
+
+            .period-item {
+                flex-direction: row-reverse;
+                align-items: center;
+                padding: 9px 6px;
+            }
+
+            .subject-name {
+                padding-right: 10px;
+                margin-bottom: 0;
+            }
+
+            .period-time {
+                background-color: var(--item-hover-bg);
+                padding: 6px 10px;
+                border-radius: 10px;
+                min-width: auto;
+            }
+
+            .period-item.completed::after {
+                content: '✓';
+                color: var(--completed-border);
+                font-weight: bold;
+                margin-left: 10px;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .schedule-container {
+                max-width: 1200px;
+                padding: 40px;
+            }
+
+            #weeklySchedule {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 25px;
+                justify-content: center;
+                align-items: start;
+            }
+
+            .day-card {
+                margin-bottom: 0;
+                width: auto;
+            }
+
+            .period-item {
+                padding: 12px 9px;
+            }
+
+            .subject-name {
+                font-size: 1.2em;
+                padding-right: 20px;
+            }
+
+            .period-time {
+                font-size: 1.1em;
+                padding: 0 0 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="schedule-container">
+        <h1>التوقيت</h1>
+
+        <div id="weeklySchedule" class="content-section active">
+            <!-- Day cards will be dynamically added here by JavaScript -->
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const scheduleContainer = document.querySelector('#weeklySchedule');
+        const days = [
+            {
+                name: 'الأحد',
+                periods: [
+                    { time: '08:00 - 09:00', subject: 'اللغة الفرنسية' },
+                    { time: '09:00 - 10:00', subject: 'الرياضيات' },
+                    { time: '10:00 - 11:00', subject: 'اللغة العربية' },
+                    { time: '11:00 - 12:00', subject: 'اللغة العربية' }
+                ],
+                afternoonPeriods: [
+                    { time: '13:30 - 14:30', subject: 'الفلسفة' },
+                    { time: '14:30 - 15:30', subject: 'اللغة الإنجليزية' },
+                    { time: '15:30 - 16:30', subject: 'اللغة الإنجليزية' },
+                    { time: '16:30 - 17:30', subject: 'الشريعة' }
+                ]
+            },
+            {
+                name: 'الإثنين',
+                periods: [
+                    { time: '08:00 - 09:00', subject: 'اللغة الفرنسية' },
+                    { time: '09:00 - 10:00', subject: 'الرياضيات' },
+                    { time: '10:00 - 11:00', subject: 'رياضة' },
+                    { time: '11:00 - 12:00', subject: 'رياضة' }
+                ],
+                afternoonPeriods: [
+                    { time: '13:30 - 14:30', subject: 'الفلسفة' },
+                    { time: '14:30 - 15:30', subject: 'الفلسفة' },
+                    { time: '15:30 - 16:30', subject: 'اجتماعيات' },]
+            },
+            {
+                name: 'الثلاثاء',
+                periods: [
+                    { time: '08:00 - 09:00', subject: 'اللغة العربية' },
+                    { time: '09:00 - 10:00', subject: 'اللغة العربية' },
+                    { time: '10:00 - 11:00', subject: 'الشريعة' },
+                    { time: '11:00 - 12:00', subject: 'الاجتماعيات ' }
+                ],
+                afternoonPeriods: []
+            },
+            {
+                name: 'الأربعاء',
+                periods: [
+                    { time: '08:00 - 09:00', subject: 'الفلسفة' },
+                    { time: '09:00 - 10:00', subject: 'الفلسفة' },
+                    { time: '10:00 - 11:00', subject: 'اللغة العربية' },
+                    { time: '11:00 - 12:00', subject: 'اللغة العربية' }
+                ],
+                afternoonPeriods: [
+                    { time: '13:30 - 14:30', subject: 'اللغة الفرنسية' },
+                    { time: '14:30 - 15:30', subject: 'اجتماعيات' },
+                    { time: '15:30 - 16:30', subject: 'اللغة الإنجليزية'  },]
+            },
+            {
+                name: 'الخميس',
+                periods: [
+                    { time: '08:00 - 09:00', subject: 'الفلسفة' },
+                    { time: '09:00 - 10:00', subject: 'الفلسفة' },
+                    { time: '10:00 - 11:00', subject: 'اللغة الإنجليزية'  },
+                    { time: '11:00 - 12:00', subject: 'اللغة الفرنسية' }
+                ],
+                afternoonPeriods: [
+                    { time: '13:30 - 14:30', subject: 'اجتماعيات' },
+                    { time: '14:30 - 15:30', subject: 'اللغة العربية' },
+                ]
+            }
+        ];
+
+        function createRipple(event) {
+            const button = event.currentTarget;
+            const circle = document.createElement('span');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            const radius = diameter / 2;
+
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - (button.getBoundingClientRect().left + radius)}px`;
+            circle.style.top = `${event.clientY - (button.getBoundingClientRect().top + radius)}px`;
+            circle.classList.add('ripple');
+
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) ripple.remove();
+
+            button.appendChild(circle);
+        }
+
+        function renderPeriods(periodsArray, container) {
+            periodsArray.forEach(period => {
+                const periodItem = document.createElement('div');
+                periodItem.classList.add('period-item');
+
+                const subjectSpan = document.createElement('span');
+                subjectSpan.classList.add('subject-name');
+                subjectSpan.textContent = period.subject;
+
+                const timeSpan = document.createElement('span');
+                timeSpan.classList.add('period-time');
+                timeSpan.textContent = period.time;
+
+                periodItem.appendChild(subjectSpan);
+                periodItem.appendChild(timeSpan);
+
+                periodItem.addEventListener('click', (e) => {
+                    periodItem.classList.toggle('completed');
+                    createRipple(e);
+                });
+
+                container.appendChild(periodItem);
+            });
+        }
+
+        days.forEach((dayData) => {
+            const dayCard = document.createElement('div');
+            dayCard.classList.add('day-card');
+
+            const dayHeader = document.createElement('div');
+            dayHeader.classList.add('day-header');
+            dayHeader.textContent = dayData.name;
+            dayCard.appendChild(dayHeader);
+
+            const periodsList = document.createElement('div');
+            periodsList.classList.add('periods-list');
+
+            if (dayData.periods.length > 0) {
+                const morningDivider = document.createElement('hr');
+                morningDivider.classList.add('session-divider', 'morning');
+                periodsList.appendChild(morningDivider);
+                renderPeriods(dayData.periods, periodsList);
+            }
+
+            if (dayData.afternoonPeriods && dayData.afternoonPeriods.length > 0) {
+                const afternoonDivider = document.createElement('hr');
+                afternoonDivider.classList.add('session-divider', 'afternoon');
+                periodsList.appendChild(afternoonDivider);
+                renderPeriods(dayData.afternoonPeriods, periodsList);
+            }
+
+            dayCard.appendChild(periodsList);
+            scheduleContainer.appendChild(dayCard);
+
+            dayHeader.addEventListener('click', (e) => {
+                dayCard.classList.toggle('expanded');
+                createRipple(e);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
